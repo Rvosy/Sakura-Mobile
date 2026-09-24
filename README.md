@@ -12,7 +12,7 @@
 
 ## 使用
 
-1. 在 Sakura 中安装并启用“手机聊天”插件。
+1. 打开“设置 → 插件 → 市场”，安装“手机聊天”，再到“已安装”中启用。已有 ZIP 时，也可通过“更多 → 从 ZIP 安装…”导入。
 2. 打开插件设置，设置访问令牌，开启手机网页服务并保存。
 3. 将手机和电脑接入同一局域网，或通过 Tailscale 互通。
 4. 在手机浏览器中打开插件设置显示的访问地址。
@@ -30,7 +30,9 @@
 
 ## 运行要求
 
-需要支持 Plugin API v4 的 Sakura，无需额外安装 Python 依赖。
+插件使用 Plugin API v4，并依赖 `plugin.yaml` 中声明的宿主服务；建议使用支持插件市场的 Sakura。无需额外安装 Python 依赖。
+
+从内置版本升级时，支持迁移的 Sakura 会保留原设置和启停选择。迁移失败时，可按 [插件升级指南](https://github.com/Rvosy/Sakura/blob/main/docs/userdocs/RUNTIME_V2_PLUGINS.md#升级已有安装)从市场修复。
 
 ## 许可证
 

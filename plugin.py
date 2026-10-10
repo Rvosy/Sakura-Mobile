@@ -17,18 +17,20 @@ except ImportError:
 
 
 PLUGIN_ID = "sakura_mobile"
-MOBILE_SERVICE = "sakura.host.mobile"
+CONVERSATION_SERVICE = "sakura.host.conversation"
 SETTINGS_SECTION_ID = "sakura_mobile"
 
 
 class SakuraMobilePlugin:
-    """Mobile HTTP endpoint backed by an ordinary Worker-local mobile Service."""
+    """Mobile HTTP endpoint backed by an ordinary Host conversation service."""
 
     def __init__(self) -> None:
         self._logger: Any = None
         self._config: object | None = None
-        self._mobile_service: object | None = None
+        self._conversation: object | None = None
         self._artifacts: object | None = None
+        self._character: object | None = None
+        self._timeline: object | None = None
         self._server: Any | None = None
         self._thread: threading.Thread | None = None
         self._last_error = ""
@@ -38,8 +40,10 @@ class SakuraMobilePlugin:
         self._logger = getattr(context, "get")("sakura.host.logging")
         self._data_dir = Path(getattr(context, "data_path")(".")).resolve()
         self._config = getattr(context, "config")
-        self._mobile_service = getattr(context, "get")(MOBILE_SERVICE)
+        self._conversation = getattr(context, "get")(CONVERSATION_SERVICE)
         self._artifacts = getattr(context, "get")("sakura.host.artifacts")
+        self._character = getattr(context, "get")("sakura.host.character")
+        self._timeline = getattr(context, "get")("sakura.host.timeline")
         getattr(context, "effect")(self.stop)
         getattr(context, "on")("sakura.host.app.started", lambda _event: self.start())
         getattr(self._config, "on_change")(self._apply_config)
@@ -77,7 +81,7 @@ class SakuraMobilePlugin:
         current = self.config()
         merged = _normalized_config({**current, **dict(values)})
         if merged["enabled"] and not str(values.get("token", current["token"])).strip():
-            raise ValueError("启用手机网页端时访问 token 不能为空。")
+            raise ValueError("启用手机网页端时访问令牌不能为空。")
         updates = {key: merged[key] for key in values if key in merged}
         return getattr(self._require_config(), "update")(updates)
 
@@ -99,9 +103,9 @@ class SakuraMobilePlugin:
         if not config["enabled"]:
             self._last_error = ""
             return
-        mobile_service = self._mobile_service
+        conversation = self._conversation
         artifacts = self._artifacts
-        if mobile_service is None or artifacts is None:
+        if conversation is None or artifacts is None:
             self._last_error = "移动端聊天服务尚未就绪。"
             self._logger.warning(self._last_error, fields={"reason_code": "MOBILE_SERVICE_UNAVAILABLE"})
             return
@@ -112,8 +116,9 @@ class SakuraMobilePlugin:
         try:
             server = run_mobile_server(
                 self._data_dir,
-                mobile_service,
+                conversation,
                 artifacts,
+                character=self._character, timeline=self._timeline,
                 host=str(config["host"]),
                 port=int(config["port"]),
                 token=str(config["token"]),
@@ -207,7 +212,7 @@ def _settings_descriptor() -> dict[str, Any]:
             },
             {
                 "key": "token",
-                "label": "访问 token",
+                "label": "访问令牌",
                 "type": "password",
                 "default": "sakura",
                 "required": True,

@@ -30,11 +30,11 @@
 
 ## 运行要求
 
-1.1.0-rc.2 是预发布版本，要求 Sakura 1.3.2 或更新版本。Sakura 1.3.1 不兼容此版本。插件使用 Plugin API v4，并依赖 `plugin.yaml` 中声明的宿主服务，无需额外安装 Python 依赖。
+插件使用 Plugin API v4，并依赖 `plugin.yaml` 中声明的宿主服务，无需额外安装 Python 依赖。
 
 当前角色和历史通过 `sakura.host.character`、`sakura.host.timeline` 读取，聊天通过 `sakura.host.conversation` 的 `begin/poll` 等待宿主完成。插件不再设置独立的聊天执行超时，回复同时进入桌面字幕及 TTS 流程，语音在电脑播放。图片通过 `sakura.host.artifacts` 传递。
 
-从内置版本升级时，支持迁移的 Sakura 会保留原设置和启停选择。迁移失败时，可按 [插件升级指南](https://github.com/Rvosy/Sakura/blob/main/docs/userdocs/RUNTIME_V2_PLUGINS.md#升级已有安装)从市场修复。
+从内置版本升级时，支持迁移的 Sakura 会保留原设置和启停选择。迁移失败时，可按 [插件升级指南](https://github.com/Rvosy/Sakura/blob/main/docs/guide/plugins.md#更新与修复)从市场修复。
 
 ## 许可证
 
